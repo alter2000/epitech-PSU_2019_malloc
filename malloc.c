@@ -24,14 +24,14 @@ void *malloc(size_t s)
 void *calloc(size_t n, size_t s)
 {
     unsigned char *p = NULL;
-    size_t m = n * s;
+    size_t mul = n * s;
 
-    if (m < n || m < s) {
+    if (mul < n || mul < s) {
         errno = ENOMEM;
         return NULL;
     }
-    p = malloc(m);
-    for (size_t i = 0; i < m; i++)
+    p = malloc(mul);
+    for (size_t i = 0; i < mul; i++)
         p[i] = 0;
     return p;
 }
@@ -47,16 +47,16 @@ void *realloc(void *p, size_t n)
         return NULL;
     }
     new = find_free(n);
-    if (p == new)
-        return new;
-    return mymemcpy(p, new, n);
+    return (p == new) ? new : mymemcpy(p, new, n);
 }
 
 void *reallocarray(void *p, size_t n, size_t s)
 {
-    if (n * s < n || n * s < s) {
+    size_t mul = n * s;
+
+    if (mul < n || mul < s) {
         errno = ENOMEM;
         return NULL;
     }
-    return realloc(p, n * s);
+    return realloc(p, mul);
 }
