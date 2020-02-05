@@ -5,7 +5,11 @@
 ## automated desc ftw
 ##
 
-SRC = ./malloc.c
+SRC = \
+	  ./malloc.c \
+	  ./free.c \
+	  ./find_free.c \
+	  ./helpers.c
 
 DFLAGS = \
 		 -fsanitize=address \
@@ -33,7 +37,9 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 
-re: fclean all
+re:
+	$(MAKE) fclean
+	$(MAKE) all
 
 %.o: %.c
 	$(CPL) $(CFLAGS) -o $@ -c $<
