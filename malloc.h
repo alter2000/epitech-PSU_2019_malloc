@@ -19,7 +19,7 @@ typedef struct {
 typedef struct sminfo *minfo_t;
 struct sminfo {
     struct sminfo *n;
-    bool free;
+    size_t free;
 };
 
 #define LSMI sizeof(minfo_t)

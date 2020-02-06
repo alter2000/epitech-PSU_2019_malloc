@@ -7,7 +7,13 @@
 
 #include "malloc.h"
 
+static bool prev_alloc(void *p)
+{
+    return (p < sbrk(0) && ((minfo_t)p - LSMI)->free == 0);
+}
+
 void free(void *p)
 {
-    (void)p;
+    if (prev_alloc(p) && (size_t)p % 2 == 0)
+        ((minfo_t)p - LSMI)->free = true;
 }
