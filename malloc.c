@@ -8,8 +8,6 @@
 #include <errno.h>
 #include "malloc.h"
 
-static const size_t PAGESIZE = 4096;
-
 void *malloc(size_t s)
 {
     if (!s) {
@@ -31,6 +29,8 @@ void *calloc(size_t n, size_t s)
         return NULL;
     }
     p = malloc(mul);
+    if (!p)
+        return p;
     for (size_t i = 0; i < mul; i++)
         p[i] = 0;
     return p;

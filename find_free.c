@@ -7,7 +7,7 @@
 
 #include "malloc.h"
 
-extern const size_t PAGESIZE;
+static const size_t PAGESIZE = 4096;
 
 static size_t find_contiguous(minfo_t cur, size_t s)
 {
