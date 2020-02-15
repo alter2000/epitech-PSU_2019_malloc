@@ -43,7 +43,7 @@ void *find_free(size_t s)
     return (r) ? r + LSMI : append_mem(hs, s);
 }
 
-static void *expandbrk(intptr_t i)
+static bool expandbrk(intptr_t i)
 {
     void *cur = sbrk(0);
     long pagesize = sysconf(_SC_PAGESIZE);
@@ -52,20 +52,23 @@ static void *expandbrk(intptr_t i)
         pagesize = PAGESIZE;
     i += (i % pagesize) ? i % pagesize : 0;
     i += ((size_t)cur % pagesize) ? (size_t)cur % pagesize : 0;
-    return sbrk(i);
+    return (sbrk(i) == (void *)-1);
 }
 
 void *append_mem(minfo_t hs, size_t s)
 {
     minfo_t newtop = sbrk(0);
+    minfo_t tmp = hs;
+
     if (expandbrk(LSMI + s))
         return NULL;
     newtop->free = true;
     newtop->n = NULL;
-    if (hs)
-        hs->n = newtop;
+    for (; tmp; tmp = tmp->n);
+    if (tmp)
+        tmp->n = newtop;
     else
-        hs = newtop;
+        tmp = newtop;
     return newtop + LSMI;
 }
 

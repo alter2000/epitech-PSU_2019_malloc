@@ -22,6 +22,7 @@ NAME = libmy_malloc.so
 LDFLAGS = -shared
 CPL = gcc
 CFLAGS = -Wextra -Wall -I. -fPIC
+DFLAGS = -Wextra -Wall -I. -fPIC -g
 
 OBJ = $(SRC:.c=.o)
 
@@ -29,6 +30,9 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CPL) -o $(NAME) $(OBJ) $(LDFLAGS)
+
+debug: $(SRC)
+	$(CPL) -o $(NAME) $(SRC) $(DFLAGS) $(LDFLAGS)
 
 clean:
 	$(foreach var, $(OBJ), if [ -e $(var) ] ; then rm -f $(var) ; fi;)
