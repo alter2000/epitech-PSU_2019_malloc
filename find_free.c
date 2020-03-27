@@ -7,7 +7,7 @@
 
 #include "malloc.h"
 
-static const size_t PAGESIZE = 4096;
+static const long int PAGESIZE = 4096;
 
 static size_t find_contiguous(minfo_t cur, size_t s)
 {
@@ -31,8 +31,6 @@ void *find_free(size_t s)
     size_t tmp = 0;
     void *r = NULL;
 
-    if (!s)
-        return NULL;
     for (minfo_t cur = hs; cur; cur = cur->n) {
         tmp = find_contiguous(cur, s);
         if (tmp < bestfit) {
@@ -40,16 +38,14 @@ void *find_free(size_t s)
             r = cur;
         }
     }
-    return (r) ? r + LSMI : append_mem(hs, s);
+    return r ? r + LSMI : append_mem(hs, s);
 }
 
 static bool expandbrk(intptr_t i)
 {
     void *cur = sbrk(0);
-    long pagesize = sysconf(_SC_PAGESIZE);
+    long pagesize = sysconf(_SC_PAGESIZE) ? sysconf(_SC_PAGESIZE) : PAGESIZE;
 
-    if (!pagesize)
-        pagesize = PAGESIZE;
     i += (i % pagesize) ? i % pagesize : 0;
     i += ((size_t)cur % pagesize) ? (size_t)cur % pagesize : 0;
     return (sbrk(i) == (void *)-1);

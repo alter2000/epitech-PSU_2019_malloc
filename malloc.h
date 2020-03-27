@@ -11,15 +11,11 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-typedef struct {
-    void *f;
-    void *s;
-} pair_t;
-
 typedef struct sminfo *minfo_t;
 struct sminfo {
     struct sminfo *n;
-    size_t free;
+    size_t size;
+    int free;
 };
 
 #define LSMI sizeof(minfo_t)

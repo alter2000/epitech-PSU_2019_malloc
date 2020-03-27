@@ -9,7 +9,9 @@
 
 static bool prev_alloc(void *p)
 {
-    return (p < sbrk(0) && ((minfo_t)p - LSMI)->free == 0);
+    minfo_t proper = p ? (minfo_t)p - LSMI : NULL;
+
+    return (proper && p < sbrk(0) && proper->free == 0);
 }
 
 void free(void *p)
