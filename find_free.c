@@ -5,6 +5,7 @@
 ** automated desc ftw
 */
 
+#include <stddef.h>
 #include "malloc.h"
 
 static const long int PAGESIZE = 4096;
@@ -12,15 +13,13 @@ static const long int PAGESIZE = 4096;
 static size_t find_contiguous(minfo_t cur, size_t s)
 {
     size_t acc = 0;
+    const ptrdiff_t t = cur->n - cur;
 
-    if (cur->free && cur->n - cur >= s)
+    if (cur->free && t > 0 && (size_t)t >= s)
         return cur->n - cur;
-    for (minfo_t next = cur; next->free; next = next->n) {
-        if (next->n)
-            acc += next->n - next;
-        if (acc >= s)
-            break;
-    }
+    for (minfo_t next = cur; (void *)((unsigned char *)next + LSMI) < sbrk(0)
+            && next->free && acc < s; next = next->n)
+        acc += next->n ? next->n - next : 0;
     return acc;
 }
 
@@ -38,16 +37,21 @@ void *find_free(size_t s)
             r = cur;
         }
     }
-    return r ? r + LSMI : append_mem(hs, s);
+    r = r && r + LSMI < sbrk(0) ? r + LSMI : append_mem(hs, s);
+    ((minfo_t)r)->pointed = r + LSMI;
+    ((minfo_t)r)->free = 0;
+    ((minfo_t)r)->size = s;
+    return r;
 }
 
 static bool expandbrk(intptr_t i)
 {
     void *cur = sbrk(0);
-    long pagesize = sysconf(_SC_PAGESIZE) ? sysconf(_SC_PAGESIZE) : PAGESIZE;
+    const long pagesize = (sysconf(_SC_PAGESIZE) ?  sysconf(_SC_PAGESIZE)
+            : PAGESIZE) * 2;
 
-    i += (i % pagesize) ? i % pagesize : 0;
-    i += ((size_t)cur % pagesize) ? (size_t)cur % pagesize : 0;
+    i += ((size_t)cur % pagesize) ? pagesize - (size_t)cur % pagesize : 0;
+    i += (i % pagesize) ? pagesize - i % pagesize : 0;
     return (sbrk(i) == (void *)-1);
 }
 
@@ -66,16 +70,4 @@ void *append_mem(minfo_t hs, size_t s)
     else
         tmp = newtop;
     return newtop + LSMI;
-}
-
-void split(minfo_t b, size_t len)
-{
-    minfo_t new = (minfo_t)(
-                        (unsigned char *)b
-                        + len
-                        + sizeof(b)
-                        - 1);
-    new->n = b->n;
-    new->free = true;
-    b->n = new;
 }

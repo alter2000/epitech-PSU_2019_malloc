@@ -5,17 +5,28 @@
 ** automated desc ftw
 */
 
+#include <stddef.h>
 #include "malloc.h"
 
-static bool prev_alloc(void *p)
+bool proper_alloc(void *p)
 {
-    minfo_t proper = p && (long)p - LSMI > 0 ? p - LSMI : NULL;
+    minfo_t proper = p && (long)p - LSMI > 0 \
+                     ? p - LSMI : NULL;
+    const bool not_null = proper && p;
+    const bool under_heap = not_null && p < sbrk(0) \
+                            && (size_t)p % 2 == 0;
+    const bool maybe_free = under_heap \
+                            && proper->pointed == p
+                            && proper->free == 0;
 
-    return (proper && p && p < sbrk(0) && proper->free == 0);
+    return maybe_free;
 }
 
 void free(void *p)
 {
-    if (prev_alloc(p) && (size_t)p % 2 == 0)
-        ((minfo_t)p - LSMI)->free = true;
+    if (!proper_alloc(p)) {
+        write(STDERR_FILENO, "free: invalid pointer\n", 22);
+        _exit(84);
+    } else
+        ((minfo_t)p - 1)->free = true;
 }

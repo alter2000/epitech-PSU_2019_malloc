@@ -15,10 +15,11 @@ typedef struct sminfo *minfo_t;
 struct sminfo {
     struct sminfo *n;
     size_t size;
+    void *pointed;
     int free;
 };
 
-#define LSMI sizeof(minfo_t)
+#define LSMI sizeof(struct sminfo)
 
 void *malloc(size_t s);
 void *realloc(void *p, size_t n);
@@ -29,5 +30,8 @@ void free(void *p);
 void *find_free(size_t s);
 void *append_mem(minfo_t hs, size_t s);
 void *mymemcpy(void *o, void *n, size_t s);
+void *mymemcpy(void *o, void *n, size_t s);
+void *ptrcpy(void *o, void *n);
+bool proper_alloc(void *p);
 
 #endif
