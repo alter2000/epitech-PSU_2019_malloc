@@ -6,10 +6,10 @@
 */
 
 #ifndef LIBMINE_MALLOC_H_
-#define LIBMINE_MALLOC_H_
+# define LIBMINE_MALLOC_H_
 
-#include <unistd.h>
-#include <stdbool.h>
+# include <unistd.h>
+# include <stdbool.h>
 
 typedef struct sminfo *minfo_t;
 struct sminfo {
@@ -19,7 +19,8 @@ struct sminfo {
     int free;
 };
 
-#define LSMI sizeof(struct sminfo)
+# define LSMI sizeof(struct sminfo)
+# define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 void *malloc(size_t s);
 void *realloc(void *p, size_t n);
@@ -29,9 +30,12 @@ void free(void *p);
 
 void *find_free(size_t s);
 void *append_mem(minfo_t hs, size_t s);
-void *mymemcpy(void *o, void *n, size_t s);
+bool proper_alloc(void *p);
+
 void *mymemcpy(void *o, void *n, size_t s);
 void *ptrcpy(void *o, void *n);
-bool proper_alloc(void *p);
+
+void *realloc_smaller(void *p, size_t n);
+void *realloc_larger(void *p, size_t n);
 
 #endif

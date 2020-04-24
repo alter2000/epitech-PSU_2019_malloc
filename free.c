@@ -27,6 +27,6 @@ void free(void *p)
     if (!proper_alloc(p)) {
         write(STDERR_FILENO, "free: invalid pointer\n", 22);
         _exit(84);
-    } else
-        ((minfo_t)p - 1)->free = true;
+    }
+    ((minfo_t)p - 1)->free = true;
 }

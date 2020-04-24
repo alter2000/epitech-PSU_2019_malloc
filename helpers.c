@@ -18,9 +18,8 @@ void *mymemcpy(void *o, void *n, size_t s)
 
 void *ptrcpy(void *o, void *n)
 {
-
-    free(o);
-    n = mymemcpy(o, n, ((minfo_t)n - 1)->size);
+    n = mymemcpy(o, n, MIN(((minfo_t)n - 1)->size, ((minfo_t)o - 1)->size));
     ((minfo_t)n - 1)->size = ((minfo_t)o - 1)->size;
+    free(o);
     return n;
 }
