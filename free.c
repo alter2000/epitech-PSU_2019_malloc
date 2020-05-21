@@ -24,8 +24,10 @@ bool proper_alloc(void *p)
 
 void free(void *p)
 {
+    if (!p)
+        return;
     if (!proper_alloc(p)) {
-        write(STDERR_FILENO, "free: invalid pointer\n", 22);
+        write(STDERR_FILENO, "free(): invalid pointer\n", 24);
         _exit(84);
     }
     ((minfo_t)p - 1)->free = true;

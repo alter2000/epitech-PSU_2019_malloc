@@ -41,7 +41,7 @@ void *find_free(size_t s)
     ((minfo_t)r)->pointed = r + LSMI;
     ((minfo_t)r)->free = 0;
     ((minfo_t)r)->size = s;
-    return r;
+    return r + LSMI;
 }
 
 static bool expandbrk(intptr_t i)
