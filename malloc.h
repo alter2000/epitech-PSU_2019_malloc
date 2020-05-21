@@ -32,10 +32,6 @@ void *find_free(size_t s);
 void *append_mem(minfo_t hs, size_t s);
 bool proper_alloc(void *p);
 
-void *mymemcpy(void *o, void *n, size_t s);
 void *ptrcpy(void *o, void *n);
-
-void *realloc_smaller(void *p, size_t n);
-void *realloc_larger(void *p, size_t n);
 
 #endif

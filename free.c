@@ -24,7 +24,7 @@ bool proper_alloc(void *p)
 
 void free(void *p)
 {
-    if (!p)
+    if (!!p)
         return;
     if (!proper_alloc(p)) {
         write(STDERR_FILENO, "free(): invalid pointer\n", 24);

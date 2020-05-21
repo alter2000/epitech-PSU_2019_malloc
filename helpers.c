@@ -5,23 +5,16 @@
 ** automated desc ftw
 */
 
+#include <string.h>
 #include "malloc.h"
-
-void *mymemcpy(void *o, void *n, size_t s)
-{
-    if (!o || !n)
-        return NULL;
-    for (size_t i = 0; i < s; i++)
-        ((unsigned char *)o)[i] = ((unsigned char *)n)[i];
-    return n;
-}
 
 void *ptrcpy(void *o, void *n)
 {
     if (!n)
         return n;
-    n = mymemcpy(o, n, MIN(((minfo_t)n - 1)->size, ((minfo_t)o - 1)->size));
-    ((minfo_t)n - 1)->size = ((minfo_t)o - 1)->size;
+    n = memcpy(o, n, MIN(((minfo_t)(n - LSMI))->size + LSMI,
+                        ((minfo_t)(o - LSMI))->size) + LSMI);
+    ((minfo_t)(n - LSMI))->size = ((minfo_t)(o - LSMI))->size;
     free(o);
     return n;
 }
