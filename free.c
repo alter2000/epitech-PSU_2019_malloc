@@ -10,25 +10,21 @@
 
 bool proper_alloc(void *p)
 {
-    minfo_t proper = p && (long)p - LSMI > 0 \
-                     ? p - LSMI : NULL;
-    const bool not_null = proper && p;
-    const bool under_heap = not_null && p < sbrk(0) \
+    minfo_t proper = (size_t)p > LSMI \
+                    ? p - LSMI : NULL;
+    const bool under_heap = proper && p < sbrk(0) \
                             && (size_t)p % 2 == 0;
-    const bool maybe_free = under_heap \
-                            && proper->pointed == p
-                            && proper->free == 0;
 
-    return maybe_free;
+    return under_heap;
 }
 
 void free(void *p)
 {
-    if (!!p)
+    if (!p)
         return;
     if (!proper_alloc(p)) {
         write(STDERR_FILENO, "free(): invalid pointer\n", 24);
         _exit(84);
     }
-    ((minfo_t)p - 1)->free = true;
+    IMPL(p)->free = true;
 }

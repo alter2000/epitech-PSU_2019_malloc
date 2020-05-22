@@ -19,8 +19,13 @@ struct sminfo {
     int free;
 };
 
-# define LSMI sizeof(struct sminfo)
 # define MIN(a, b) (((a) < (b)) ? (a) : (b))
+/* malloc metadata size */
+# define LSMI sizeof(struct sminfo)
+/* go from user to implementation pointer */
+# define IMPL(ptr) ((minfo_t)((size_t)ptr - LSMI))
+/* and vice versa */
+# define MEM(ptr)  ((void *) ((size_t)ptr + LSMI))
 
 void *malloc(size_t s);
 void *realloc(void *p, size_t n);

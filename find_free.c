@@ -17,7 +17,7 @@ static size_t find_contiguous(minfo_t cur, size_t s)
 
     if (cur->free && t > 0 && (size_t)t >= s)
         return cur->n - cur;
-    for (minfo_t next = cur; (void *)((unsigned char *)next + LSMI) < sbrk(0)
+    for (minfo_t next = cur; MEM(next) < sbrk(0)
             && next->free && acc < s; next = next->n)
         acc += next->n ? next->n - next : 0;
     return acc;
@@ -37,20 +37,20 @@ void *find_free(size_t s)
             r = cur;
         }
     }
-    r = r && r + LSMI < sbrk(0) ? r + LSMI : append_mem(hs, s);
-    ((minfo_t)r)->pointed = r + LSMI;
+    r = r && MEM(r) < sbrk(0) ? r : append_mem(hs, s);
+    ((minfo_t)r)->pointed = MEM(r);
     ((minfo_t)r)->free = 0;
     ((minfo_t)r)->size = s;
-    return r + LSMI;
+    return MEM(r);
 }
 
 static bool expandbrk(intptr_t i)
 {
-    void *cur = sbrk(0);
-    const long pagesize = (sysconf(_SC_PAGESIZE) ?  sysconf(_SC_PAGESIZE)
+    size_t cur = (size_t)sbrk(0);
+    const long pagesize = (sysconf(_SC_PAGESIZE) ? sysconf(_SC_PAGESIZE)
             : PAGESIZE) * 2;
 
-    i += ((size_t)cur % pagesize) ? pagesize - (size_t)cur % pagesize : 0;
+    i += (cur % pagesize) ? pagesize - cur % pagesize : 0;
     i += (i % pagesize) ? pagesize - i % pagesize : 0;
     return (sbrk(i) == (void *)-1);
 }
@@ -62,12 +62,11 @@ void *append_mem(minfo_t hs, size_t s)
 
     if (expandbrk(LSMI + s))
         return NULL;
-    newtop->free = true;
     newtop->n = NULL;
     for (; tmp; tmp = tmp->n);
     if (tmp)
         tmp->n = newtop;
     else
         tmp = newtop;
-    return newtop + LSMI;
+    return newtop;
 }

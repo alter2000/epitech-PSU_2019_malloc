@@ -12,9 +12,7 @@ void *ptrcpy(void *o, void *n)
 {
     if (!n)
         return n;
-    n = memcpy(o, n, MIN(((minfo_t)(n - LSMI))->size + LSMI,
-                        ((minfo_t)(o - LSMI))->size) + LSMI);
-    ((minfo_t)(n - LSMI))->size = ((minfo_t)(o - LSMI))->size;
+    memmove(n, o, MIN(IMPL(n)->size, IMPL(o)->size) + LSMI);
     free(o);
     return n;
 }

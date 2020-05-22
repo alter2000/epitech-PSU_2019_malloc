@@ -42,13 +42,13 @@ void *realloc(void *p, size_t n)
 
     if (!p)
         return malloc(n);
-    if (!proper_alloc(p)) {
-        write(STDERR_FILENO, "realloc: invalid pointer\n", 25);
-        _exit(84);
-    }
     if (!n) {
         free(p);
         return NULL;
+    }
+    if (!proper_alloc(p)) {
+        write(STDERR_FILENO, "realloc: invalid pointer\n", 25);
+        _exit(84);
     }
     new = find_free(n);
     return (p == new) ? new : ptrcpy(p, new);
